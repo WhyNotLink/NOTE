@@ -2,6 +2,10 @@
 
 
 
+
+
+
+
 ### gradle安装位置
 
 ![image-20260112171408944](Android.assets/image-20260112171408944.png)
@@ -142,19 +146,79 @@ dependencies {
 ### build.gradile.kts (project)
 
 ```
-// Gradle 8.7推荐用plugins块声明插件（替代旧的buildscript），无版本冲突
 plugins {
-    id("com.android.application") version "8.4.0" apply false
-    id("org.jetbrains.kotlin.android") version "1.9.0" apply false
+    id("com.android.application") version "8.2.2" apply false
+    id("com.android.library") version "8.2.2" apply false
+    id("org.jetbrains.kotlin.android") version "1.9.22" apply false
 }
 
-// 修复buildDir弃用，适配Gradle 8.x
-tasks.register("clean", Delete::class) {
-    delete(layout.buildDirectory.get().asFile)
+```
+
+或者
+
+```
+// Top-level build file where you can add configuration options common to all sub-projects/modules.
+plugins {
+    alias(libs.plugins.android.application) apply false
+    alias(libs.plugins.kotlin.android) apply false
 }
 ```
 
+### libs.versions.toml
 
+```
+[versions]
+agp = "8.6.0"
+junit = "4.13.2"
+junitVersion = "1.1.5"
+espressoCore = "3.5.1"
+appcompat = "1.6.1"
+material = "1.10.0"
+activity = "1.8.0"
+constraintlayout = "2.1.4"
+
+[libraries]
+junit = { group = "junit", name = "junit", version.ref = "junit" }
+ext-junit = { group = "androidx.test.ext", name = "junit", version.ref = "junitVersion" }
+espresso-core = { group = "androidx.test.espresso", name = "espresso-core", version.ref = "espressoCore" }
+appcompat = { group = "androidx.appcompat", name = "appcompat", version.ref = "appcompat" }
+material = { group = "com.google.android.material", name = "material", version.ref = "material" }
+activity = { group = "androidx.activity", name = "activity", version.ref = "activity" }
+constraintlayout = { group = "androidx.constraintlayout", name = "constraintlayout", version.ref = "constraintlayout" }
+
+[plugins]
+android-application = { id = "com.android.application", version.ref = "agp" }
+```
+
+或者
+
+```
+[versions]
+agp = "8.6.0"
+kotlin = "1.9.0"
+coreKtx = "1.10.1"
+junit = "4.13.2"
+junitVersion = "1.1.5"
+espressoCore = "3.5.1"
+appcompat = "1.6.1"
+material = "1.10.0"
+activity = "1.8.0"
+constraintlayout = "2.1.4"
+
+[libraries]
+androidx-core-ktx = { group = "androidx.core", name = "core-ktx", version.ref = "coreKtx" }
+junit = { group = "junit", name = "junit", version.ref = "junit" }
+androidx-junit = { group = "androidx.test.ext", name = "junit", version.ref = "junitVersion" }
+androidx-espresso-core = { group = "androidx.test.espresso", name = "espresso-core", version.ref = "espressoCore" }
+androidx-appcompat = { group = "androidx.appcompat", name = "appcompat", version.ref = "appcompat" }
+material = { group = "com.google.android.material", name = "material", version.ref = "material" }
+androidx-activity = { group = "androidx.activity", name = "activity", version.ref = "activity" }
+androidx-constraintlayout = { group = "androidx.constraintlayout", name = "constraintlayout", version.ref = "constraintlayout" }
+
+[plugins]
+android-application = { id = "com.android.application", version.ref = "agp" }
+kotlin-android = { id = "org.jetbrains.kotlin.android", version.ref = "kotlin" }
+```
 
 # WIFI连接(manager方法(已过时))
 
@@ -591,35 +655,36 @@ public class MainActivity extends AppCompatActivity {
 
 # WIFI连接(WifiNetworkSpecifier)
 
-package com.esp_app;
 
-import android.Manifest;
-import android.content.Context;
-import android.content.Intent;
-import android.content.SharedPreferences;
-import android.content.pm.PackageManager;
-import android.net.ConnectivityManager;
-import android.net.Network;
-import android.net.NetworkCapabilities;
-import android.net.NetworkRequest;
-import android.net.wifi.WifiNetworkSpecifier;
-import android.os.Build;
-import android.os.Bundle;
-import android.text.TextUtils;
-import android.view.View;
-import android.widget.Button;
-import android.widget.EditText;
-import android.widget.ProgressBar;
-import android.widget.TextView;
-import android.widget.Toast;
 
-import androidx.annotation.NonNull;
-import androidx.annotation.RequiresApi;
-import androidx.appcompat.app.AppCompatActivity;
-import androidx.core.app.ActivityCompat;
-
-public class MainActivity extends AppCompatActivity {
-
+    package com.esp_app;
+    
+    import android.Manifest;
+    import android.content.Context;
+    import android.content.Intent;
+    import android.content.SharedPreferences;
+    import android.content.pm.PackageManager;
+    import android.net.ConnectivityManager;
+    import android.net.Network;
+    import android.net.NetworkCapabilities;
+    import android.net.NetworkRequest;
+    import android.net.wifi.WifiNetworkSpecifier;
+    import android.os.Build;
+    import android.os.Bundle;
+    import android.text.TextUtils;
+    import android.view.View;
+    import android.widget.Button;
+    import android.widget.EditText;
+    import android.widget.ProgressBar;
+    import android.widget.TextView;
+    import android.widget.Toast;
+    
+    import androidx.annotation.NonNull;
+    import androidx.annotation.RequiresApi;
+    import androidx.appcompat.app.AppCompatActivity;
+    import androidx.core.app.ActivityCompat;
+    
+    public class MainActivity extends AppCompatActivity {
     private EditText ssidInput, passwordInput, ipInput, portInput;
     private Button connectButton;
     private ProgressBar progressBar;
@@ -813,12 +878,16 @@ public class MainActivity extends AppCompatActivity {
         portInput.setText(prefs.getString(KEY_PORT, "8888"));
     	}
     }
- 
+
 
 ```
-<uses-permission android:name="android.permission.ACCESS_FINE_LOCATION"/>
-<uses-permission android:name="android.permission.ACCESS_WIFI_STATE"/>
-<uses-permission android:name="android.permission.ACCESS_NETWORK_STATE"/>
+	<uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
+    <uses-permission android:name="android.permission.CHANGE_NETWORK_STATE" />
+    <uses-permission android:name="android.permission.ACCESS_WIFI_STATE" />
+    <uses-permission android:name="android.permission.CHANGE_WIFI_STATE" />
+    <uses-permission android:name="android.permission.INTERNET" />
+    <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION" />
+    <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" />
 ```
 
 
@@ -988,5 +1057,115 @@ private void sendStopCommand() {
 }
 ```
 
-# XML
 
+
+# 其他小知识
+
+### dp，sp
+
+dp是密度无关，在不同像素上显示相同大小
+
+sp与像素点有关系，设置4个像素点可能有些设备显示的画面大有些显示的小
+
+### button颜色更改
+
+在values\themes.xml里面的parent改成如下
+
+```
+<style name="Base.Theme.CAR" parent="Theme.MaterialComponents.DayNight.NoActionBar.Bridge">
+```
+
+### 添加虚拟手柄
+
+```
+implementation("io.github.controlwear:virtualjoystick:1.10.1")
+```
+
+```
+    <io.github.controlwear.virtual.joystick.android.JoystickView
+        android:id="@+id/joystickView"
+        android:layout_width="200dp"
+        android:layout_height="200dp"
+        android:layout_gravity="center"
+        android:layout_marginTop="400dp"
+        app:JV_buttonColor="#00BCD4"
+        app:JV_backgroundColor="@color/white" />
+```
+
+| 属性名                     | 作用                           | 类型/取值                              |
+| -------------------------- | ------------------------------ | -------------------------------------- |
+| **JV_buttonColor**         | 摇杆按钮的颜色（手柄圆圈颜色） | 颜色值（如 `#FF0000` 或 `@color/red`） |
+| **JV_borderColor**         | 摇杆周围边框的颜色             | 颜色值                                 |
+| **JV_borderAlpha**         | 摇杆边框的透明度               | 0~255 的整数，0 完全透明，255 不透明   |
+| **JV_backgroundColor**     | 摇杆底盘背景的颜色             | 颜色值                                 |
+| **JV_buttonSizeRatio**     | 按钮大小占摇杆总直径比例       | 写百分数                               |
+| **JV_backgroundSizeRatio** | 底盘大小占摇杆总直径比例       | 写百分数                               |
+| **JV_fixedCenter**         | 按钮中心是否固定               | `true` 或 `false`                      |
+| **JV_autoReCenterButton**  | 松手后按钮是否自动回到中心     | `true` 或 `false`                      |
+| **JV_buttonStickToBorder** | 按钮是否始终贴边移动           | `true` 或 `false`                      |
+| **JV_enabled**             | 摇杆是否可用                   | `true` 或 `false`                      |
+| **JV_buttonDirection**     | 按钮移动方向限制               | `0=全方向, -1=水平, 1=垂直`            |
+
+#### 获取虚拟手柄数据
+
+```
+private JoystickView joystick;
+joystick = findViewById(R.id.joystickView);
+joystick.setOnMoveListener(new JoystickView.OnMoveListener() {
+            @Override
+            public void onMove(int angle, int strength) {
+                Log.d("JOY", "angle=" + angle + " strength=" + strength);
+            }
+        });
+```
+
+### 添加按钮动画
+
+新建一个button_press.xml
+
+```
+<?xml version="1.0" encoding="utf-8"?>
+<shape xmlns:android="http://schemas.android.com/apk/res/android">
+
+    <corners android:radius="30dp"/> <!-- 设置圆角的半径 -->
+    <solid android:color="#EE5CC34A"/> <!-- 设置背景颜色 -->
+
+
+</shape>
+```
+
+添加事件触发
+
+```
+shoudongkongzhi.setOnClickListener(new View.OnClickListener() {
+    @Override
+    public void onClick(View v) {
+        shoudongkongzhi.setBackgroundResource(R.drawable.button_press);
+        zidongkongzhi.setBackgroundResource(R.drawable.button);
+    }
+});
+```
+
+### 导入log包
+
+```
+import android.util.Log;
+```
+
+### 创建线程
+
+```
+private ExecutorService RXExecutor;
+private Handler handler;
+```
+
+```
+RXExecutor = Executors.newSingleThreadExecutor();
+handler = new Handler(Looper.getMainLooper());
+```
+
+```
+RXExecutor.execute(new Runnable() {
+    @Override
+    public void run() {
+```
